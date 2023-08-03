@@ -64,4 +64,3 @@ if __name__ == "__main__":
     n_q_arr = n_q([], [], [], 0, n - 1)
     for i in n_q_arr:
         print(i)
-
