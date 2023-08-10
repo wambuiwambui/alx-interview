@@ -1,24 +1,26 @@
-const axios = require('axios');
+#!/usr/bin/node
 
-const movieId = process.argv[2];
+const request = require('request');
+const API_URL = 'https://swapi-api.hbtn.io/api';
 
-if (!movieId) {
-  console.log('Usage: node 0-starwars_characters.js <movie_id>');
-  process.exit(1);
-}
+if (process.argv.length > 2) {
+  request(`${API_URL}/films/${process.argv[2]}/`, (err, _, body) => {
+    if (err) {
+      console.log(err);
+    }
+    const charactersURL = JSON.parse(body).characters;
+    const charactersName = charactersURL.map(
+      url => new Promise((resolve, reject) => {
+        request(url, (promiseErr, __, charactersReqBody) => {
+          if (promiseErr) {
+            reject(promiseErr);
+          }
+          resolve(JSON.parse(charactersReqBody).name);
+        });
+      }));
 
-const baseURL = 'https://swapi.dev/api';
-const charactersEndpoint = `/films/${movieId}/`;
-
-axios.get(`${baseURL}${charactersEndpoint}`)
-  .then(response => {
-    const characters = response.data.characters;
-    return Promise.all(characters.map(characterUrl => axios.get(characterUrl)));
-  })
-  .then(characterResponses => {
-    const characterNames = characterResponses.map(response => response.data.name);
-    characterNames.forEach(name => console.log(name));
-  })
-  .catch(error => {
-    console.error('Error:', error.message);
+    Promise.all(charactersName)
+      .then(names => console.log(names.join('\n')))
+      .catch(allErr => console.log(allErr));
   });
+}
