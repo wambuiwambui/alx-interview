@@ -1,0 +1,1 @@
+The "0-starwars_characters.js" script utilizes the Star Wars API and the "request" module to fetch and present the character list from a given movie. Upon receiving a Movie ID as a command-line argument, the script communicates with the API's "films" endpoint to retrieve character data. It then displays each character's name sequentially, adhering to the provided order.
